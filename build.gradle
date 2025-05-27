@@ -1,0 +1,85 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.ether'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	    // Core Spring Boot features
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Web server (REST API support)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // YAML parsing (choose one or both depending on approach)
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml' // if using Jackson mapping
+
+    // SnakeYAML
+    implementation 'org.yaml:snakeyaml:2.2'
+
+    // CBOR
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor'
+
+
+    // Dev tools (optional)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+     maxHeapSize = "1G"
+}
+
+springBoot {
+	mainClass = 'com.ether.Application'
+}
+
+// Define cache directory (adjust if needed)
+def cacheDir = file("./tmp/cbor-cache")
+
+// Task: Clean cache directory
+tasks.register("cleanSdeCache") {
+    group = "SDE"
+    description = "Deletes all files from the local SDE cache."
+
+    doLast {
+        if (cacheDir.exists()) {
+            println "Deleting cache files from ${cacheDir}"
+            cacheDir.deleteDir()
+        } else {
+            println "No cache directory found at ${cacheDir}"
+        }
+    }
+}
+
+// Task: List cache files
+tasks.register("listSdeCache") {
+    group = "SDE"
+    description = "Lists all files in the local SDE cache."
+
+    doLast {
+        if (cacheDir.exists()) {
+            println "SDE Cache files:"
+            cacheDir.eachFile { println "- ${it.name}" }
+        } else {
+            println "No cache directory found at ${cacheDir}"
+        }
+    }
+}
