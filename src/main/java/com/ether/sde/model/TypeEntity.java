@@ -54,7 +54,9 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Type {
+public class TypeEntity implements HasEntityId {
+
+    private String entityId;
     private int groupID;
     private Double mass;
     private Map<String, String> name;
@@ -62,7 +64,13 @@ public class Type {
     private boolean published;
     private Integer marketGroupID;
 
-    private Group group; // <-- will be linked post-load
+    private GroupEntity group; // <-- will be linked post-load
+
+    @Override
+    public String getEntityId() { return entityId; }
+    
+    @Override
+    public void setEntityId(String entityId) { this.entityId = entityId; }
 
     // Getters and Setters
     public int getGroupID() { return groupID; }
@@ -80,9 +88,13 @@ public class Type {
     public boolean isPublished() { return published; }
     public void setPublished(boolean published) { this.published = published; }
 
-    public Group getGroup() { return group; }
-    public void setGroup(Group group) { this.group = group; }
+    public GroupEntity getGroup() { return group; }
+    public void setGroup(GroupEntity group) { this.group = group; }
 
     public Integer getMarketGroupID() { return marketGroupID; }
     public void setMarketGroupID(Integer marketGroupID) { this.marketGroupID = marketGroupID; }
+
+    public String getDisplayName() {
+        return this.name.get("en");
+    }
 }

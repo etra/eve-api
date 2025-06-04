@@ -37,6 +37,7 @@ dependencies {
     // Dev tools (optional)
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -82,4 +83,35 @@ tasks.register("listSdeCache") {
             println "No cache directory found at ${cacheDir}"
         }
     }
+}
+
+tasks.register("watch") {
+    group = "SDE"
+    description = "Watches for changes in the SDE cache and rebuilds the project."
+
+    doLast {
+        def watchProcess = new ProcessBuilder("watchexec", "-e", "java", "-w", "src", "--", "./gradlew", "classes")
+            .inheritIO()
+            .start()
+
+        def bootRunProcess = new ProcessBuilder("./gradlew", "bootRun")
+            .inheritIO() 
+            .start()
+
+        // Add shutdown hook to cleanup processes
+        Runtime.runtime.addShutdownHook(new Thread({
+            watchProcess.destroy()
+            bootRunProcess.destroy()
+            println "Stopped watch processes"
+        }))
+
+        // Block until processes complete
+        watchProcess.waitFor()
+        bootRunProcess.waitFor()
+    }
+}
+
+bootJar {
+    archiveFileName = "eve-api.jar"
+    destinationDirectory = file("$buildDir/dist")
 }

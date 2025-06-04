@@ -1,0 +1,16 @@
+[Unit]
+Description=EVE Online API Service
+After=network.target
+
+[Service]
+Type=simple
+User=eve-api
+Group=eve-api
+WorkingDirectory=/opt/eve-api
+ExecStart=/usr/bin/java -jar /opt/eve-api/eve-api.jar
+Restart=always
+RestartSec=10
+Environment="SPRING_PROFILES_ACTIVE=prod"
+
+[Install]
+WantedBy=multi-user.target 

@@ -6,26 +6,27 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.ether.sde.loader.YamlLoadService;
-import com.ether.sde.model.Category;
-import com.ether.sde.model.Group;
-import com.ether.sde.model.MarketGroup;
-import com.ether.sde.model.Type;
+import com.ether.sde.model.Blueprint;
+import com.ether.sde.model.CategoryEntity;
+import com.ether.sde.model.GroupEntity;
+import com.ether.sde.model.MarketGroupEntity;
+import com.ether.sde.model.TypeEntity;
 
 import jakarta.annotation.PostConstruct;
-
 
 @Component
 public class SdeCache {
 
     private final YamlLoadService yamlLoader;
     
-    private Map<String, Group> groups;
-    private Map<String, Type> types;
-    private Map<String, Category> categories;
-    private Map<String, MarketGroup> marketGroups;
+    private Map<String, GroupEntity> groups;
+    private Map<String, TypeEntity> types;
+    private Map<String, CategoryEntity> categories;
+    private Map<String, MarketGroupEntity> marketGroups;
+    private Map<String, Blueprint> blueprints;
 
-    private HashMap<String, String> itemsNameToKey = new HashMap<>();
-
+    private HashMap<String, String> itemsNameToKey;
+    private HashMap<String, Blueprint> itemBlueprint;
 
     public SdeCache(YamlLoadService yamlLoader) {
         this.yamlLoader = yamlLoader;
@@ -33,47 +34,75 @@ public class SdeCache {
 
     @PostConstruct
     public void init() {
-        groups = yamlLoader.load("fsd/groups.yaml", Group.class);
-        types = yamlLoader.load("fsd/types.yaml", Type.class);
-        categories = yamlLoader.load("fsd/categories.yaml", Category.class);
-        marketGroups = yamlLoader.load("fsd/marketGroups.yaml", MarketGroup.class);
+        groups = yamlLoader.load("fsd/groups.yaml", GroupEntity.class);
+        types = yamlLoader.load("fsd/types.yaml", TypeEntity.class);
+        categories = yamlLoader.load("fsd/categories.yaml", CategoryEntity.class);
+        marketGroups = yamlLoader.load("fsd/marketGroups.yaml", MarketGroupEntity.class);
+        blueprints = yamlLoader.load("fsd/blueprints.yaml", Blueprint.class);
         
-        types.entrySet().stream()
-        .filter(item -> item.getValue().isPublished())
-        .filter(type -> type.getValue().getMarketGroupID() != null)
+        generateIndexes();
+    }
+
+
+    private void generateIndexes() {
+        itemsNameToKey = new HashMap<>();
+        types.values().stream()
+        .filter(item -> item.isPublished())
+        .filter(type -> type.getMarketGroupID() != null)
         .forEach(item -> {
-            itemsNameToKey.put(item.getValue().getName().get("en").toLowerCase(), item.getKey());
+            itemsNameToKey.put(item.getName().get("en").toLowerCase(), item.getEntityId());
         });
 
-        System.out.println(itemsNameToKey);
+        itemBlueprint = new HashMap<>();
+        blueprints.values().forEach(blueprint -> {
+            if (blueprint.getManufacturingProduct() != null) {
+                String key = String.valueOf(blueprint.getManufacturingProduct().typeID);
+                itemBlueprint.put(key, blueprint);
+            }
+            if (blueprint.getReactionProduct() != null) {
+                String key = String.valueOf(blueprint.getReactionProduct().typeID);
+                itemBlueprint.put(key, blueprint);
+            }
+        });
     }
 
-    
-    public Group getGroup(String id) {
-        return groups.get(id);
-    }
-
-    public Type getType(String id) {
+    public TypeEntity getType(String id) {
         return types.get(id);
     }
 
-    public MarketGroup getMarketGroup(String id) {
+    public MarketGroupEntity getMarketGroup(String id) {
         return marketGroups.get(id);
     }
 
-    public Map<String, Type> getTypes() {
+    public Blueprint getBlueprint(String id) {
+        return blueprints.get(id);
+    }
+
+    public Map<String, TypeEntity> getTypes() {
         return types;
     }
 
-    public Map<String, Group> getGroups() {
+    public Map<String, GroupEntity> getGroups() {
         return groups;
     }
 
-    public Map<String, MarketGroup> getMarketGroups() {
+    public Map<String, MarketGroupEntity> getMarketGroups() {
         return marketGroups;
+    }
+
+    public Map<String, CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public Map<String, Blueprint> getBlueprints() {
+        return blueprints;
     }
 
     public Map<String, String> getItemsNameToKey() {
         return itemsNameToKey;
+    }
+
+    public Map<String, Blueprint> getItemBlueprint() {
+        return itemBlueprint;
     }
 }

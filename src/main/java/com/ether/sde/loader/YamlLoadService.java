@@ -13,6 +13,7 @@ import org.yaml.snakeyaml.LoaderOptions;
 
 import com.ether.common.util.CborCacheLoader;
 import com.ether.config.SdeProperties;
+import com.ether.sde.model.HasEntityId;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.JavaType;
@@ -33,7 +34,8 @@ public class YamlLoadService {
         "fsd/groups.yaml",
         "fsd/types.yaml",
         "fsd/categories.yaml",
-        "fsd/marketGroups.yaml"
+        "fsd/marketGroups.yaml",
+        "fsd/blueprints.yaml"
     );
 
     public YamlLoadService(SdeProperties sdeProperties) throws IOException {
@@ -68,9 +70,9 @@ public class YamlLoadService {
 
     public <T> Map<String, T> load(String name, Class<T> valueType) {
         String cachePath = this.sdeProperties.getCbor().getCache().getPath();
-        if (!allowedFiles.contains(name)) {
-            throw new RuntimeException("YAML file not allowed for loading: " + name);
-        }
+        // if (!allowedFiles.contains(name)) {
+        //     throw new RuntimeException("YAML file not allowed for loading: " + name);
+        // }
 
         ZipEntry entry = zipFile.getEntry(name);
         if (entry == null) {
@@ -80,7 +82,13 @@ public class YamlLoadService {
         JavaType mapType = yamlMapper.getTypeFactory().constructMapType(Map.class, String.class, valueType);
 
         if (CborCacheLoader.exists(cachePath, name)) {
-            return CborCacheLoader.load(cachePath, name, mapType);
+            try {
+                return CborCacheLoader.load(cachePath, name, mapType);
+            } catch (Exception e) {
+                System.out.println("Failed to load CBOR cache for " + name + ", deleted corrupted cache");
+                CborCacheLoader.delete(cachePath, name);
+            }
+            
         }
 
         Map<String, T> result = new HashMap<>();
@@ -98,13 +106,8 @@ public class YamlLoadService {
 
                 T value = yamlMapper.readerFor(valueType).readValue(parser);
 
-                try {
-                    var method = valueType.getMethod("setId", int.class);
-                    method.invoke(value, Integer.parseInt(key));
-                } catch (NoSuchMethodException ignored) {
-                    // If the class doesn't have a setId method, skip
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to inject ID on " + name + ":" + key, e);
+                if (HasEntityId.class.isAssignableFrom(valueType)) {
+                    ((HasEntityId) value).setEntityId(key);
                 }
 
                 result.put(key, value);

@@ -20,6 +20,15 @@ public class CborCacheLoader {
         return Files.exists(toPath(cachePath, name));
     }
 
+    public static void delete(String cachePath, String name) {
+        Path path = toPath(cachePath, name);
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            System.err.println("Failed to delete CBOR cache for " + name + ": " + e.getMessage());
+        }
+    }
+
     public static <T> Map<String, T> load(String cachePath, String name, JavaType mapType) {
         Path path = toPath(cachePath, name);
         try (InputStream in = Files.newInputStream(path)) {

@@ -1,12 +1,15 @@
 package com.ether.api.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ether.api.model.ApiResponse;
+import com.ether.api.view.ItemView;
+import com.ether.sde.model.TypeEntity;
 import com.ether.sde.service.SearchService;
-import com.ether.sde.view.SearchResultView;
 
 @RestController
 @RequestMapping("/search")
@@ -18,8 +21,16 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @GetMapping("/items")
-    public SearchResultView searchItemsOnly(@RequestParam("q") String query) {
-        return searchService.searchItemsOnly(query);
+    @GetMapping("/item")
+    public ResponseEntity<ApiResponse<ItemView>> searchItem(@RequestParam("q") String query) {
+        try {
+            TypeEntity type = this.searchService.searchItemByName(query);
+            if (type == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(ApiResponse.success(new ItemView(type)));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

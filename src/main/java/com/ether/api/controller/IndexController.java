@@ -13,7 +13,6 @@ public class IndexController  {
 
     @GetMapping
     public ResponseEntity<ApiResponse<?>> getIndex() {
-        // TODO: Implement items list retrieval
         return ResponseEntity.ok(ApiResponse.success("Hello, World!"));
     }
 } 

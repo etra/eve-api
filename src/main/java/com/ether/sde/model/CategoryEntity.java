@@ -20,11 +20,18 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Category {
+public class CategoryEntity implements HasEntityId {
+    private String entityId;
 
     private int iconID;
     private Map<String, String> name;
     private boolean published;
+
+    @Override
+    public String getEntityId() { return entityId; }
+
+    @Override
+    public void setEntityId(String entityId) { this.entityId = entityId; }
 
     // Getters and Setters
     public int getIconID() {
@@ -46,5 +53,5 @@ public class Category {
         this.published = published;
     }
 
-    
+
 }

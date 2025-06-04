@@ -24,7 +24,8 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Group {
+public class GroupEntity implements HasEntityId {
+    private String entityId;
     private boolean anchorable;
     private boolean anchored;
     private int categoryID;
@@ -32,6 +33,12 @@ public class Group {
     private Map<String, String> name;
     private boolean published;
     private boolean useBasePrice;
+
+    @Override
+    public String getEntityId() { return entityId; }
+
+    @Override
+    public void setEntityId(String entityId) { this.entityId = entityId; }
 
     // Getters and Setters
     public boolean isAnchorable() { return anchorable; }

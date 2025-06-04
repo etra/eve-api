@@ -107,6 +107,121 @@ java -version
 ./gradlew --version
 ```
 
+# EVE Online API
+
+This project provides an API for accessing EVE Online's Static Data Export (SDE) files.
+
+## Development
+
+### Prerequisites
+
+- Java 21 or later
+- Gradle 8.0 or later
+
+### Building
+
+To build the project:
+
+```bash
+./gradlew build
+```
+
+### Running
+
+To run the application:
+
+```bash
+./gradlew bootRun
+```
+
+### Testing
+
+To run tests:
+
+```bash
+./gradlew test
+```
+
+## Deployment
+
+### Building the Deployment Package
+
+To create a deployment package:
+
+```bash
+./gradlew buildFatJar
+```
+
+This will create a fat jar in `build/dist/eve-api.jar`.
+
+### Server Setup
+
+1. Create the application user and group:
+   ```bash
+   sudo useradd -r -s /bin/false eve-api
+   ```
+
+2. Create the application directory:
+   ```bash
+   sudo mkdir -p /opt/eve-api
+   sudo chown eve-api:eve-api /opt/eve-api
+   ```
+
+3. Copy the deployment files:
+   ```bash
+   sudo cp build/dist/eve-api.jar /opt/eve-api/
+   sudo cp deploy/eve-api.service /etc/systemd/system/
+   ```
+
+4. Enable and start the service:
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl enable eve-api
+   sudo systemctl start eve-api
+   ```
+
+### Service Management
+
+- Check service status:
+  ```bash
+  sudo systemctl status eve-api
+  ```
+
+- View logs:
+  ```bash
+  sudo journalctl -u eve-api
+  ```
+
+- Restart service:
+  ```bash
+  sudo systemctl restart eve-api
+  ```
+
+### Directory Structure
+
+```
+/opt/eve-api/
+├── eve-api.jar
+└── logs/           # Application logs (created automatically)
+```
+
+## API Endpoints
+
+### Categories
+
+- `GET /api/categories` - List all categories
+- `GET /api/categories/{id}` - Get category by ID
+
+### Market Groups
+
+- `GET /api/market-groups` - List all market groups
+- `GET /api/market-groups/{id}` - Get market group by ID
+
+### Industry
+
+- `GET /api/industry/blueprint/{typeId}` - Get blueprint details for a type ID
+- `GET /api/industry/requirements/{typeId}` - Get all required materials for building an item
+
 
 
 

@@ -3,8 +3,7 @@ package com.ether.sde.service;
 import org.springframework.stereotype.Service;
 
 import com.ether.sde.cache.SdeCache;
-import com.ether.sde.model.Type;
-import com.ether.sde.view.SearchResultView;
+import com.ether.sde.model.TypeEntity;
 
 @Service
 public class SearchService {
@@ -16,20 +15,10 @@ public class SearchService {
     }
 
 
-    public SearchResultView searchItemsOnly(String query) {
-        System.out.println(this.cache.getItemsNameToKey());
+    public TypeEntity searchItemByName(String query) {
         final String lowered = query.toLowerCase();
-        System.out.println(lowered);
         if (this.cache.getItemsNameToKey().containsKey(lowered)) {
-            System.out.println("found");
-            String typeId = this.cache.getItemsNameToKey().get(lowered);
-            Type type = this.cache.getType(typeId);
-            
-            return new SearchResultView(
-                Integer.parseInt(typeId),
-                type.getName().get("en"),
-                this.cache.getMarketGroup(type.getMarketGroupID().toString()).getNameID().get("en")
-            );
+            return this.cache.getType(this.cache.getItemsNameToKey().get(lowered));
         }
 
         return null;

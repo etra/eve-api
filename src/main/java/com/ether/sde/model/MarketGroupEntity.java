@@ -35,13 +35,22 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MarketGroup {
-
+public class MarketGroupEntity implements HasEntityId {
+    private String entityId;
     private Map<String, String> descriptionID;
     private boolean hasTypes;
     private int iconID;
     private Map<String, String> nameID;
 
+    @Override
+    public String getEntityId() {
+        return entityId;
+    }
+
+    @Override
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
+    }
 
     public Map<String, String> getDescriptionID() {
         return descriptionID;
