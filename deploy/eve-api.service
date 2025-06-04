@@ -6,8 +6,8 @@ After=network.target
 Type=simple
 User=eve-api
 Group=eve-api
-WorkingDirectory=/opt/eve-api
-ExecStart=/usr/bin/java -jar /opt/eve-api/eve-api.jar
+WorkingDirectory=/home/arturas/eve-api
+ExecStart=java -jar /home/arturas/eve-api/eve-api.jar
 Restart=always
 RestartSec=10
 Environment="SPRING_PROFILES_ACTIVE=prod"
