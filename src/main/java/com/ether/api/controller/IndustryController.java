@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ether.api.model.ApiResponse;
+import com.ether.api.view.IndustryItemView;
 import com.ether.api.view.IndustryView;
 import com.ether.sde.model.Blueprint;
 import com.ether.sde.model.TypeEntity;
@@ -43,17 +44,22 @@ public class IndustryController {
 
         try {
             List<Blueprint.Material> materials = this.industryService.getItemManufacturingRequirements(id, runs, me);
-            String activityType = this.industryService.getItemActivityType(id);
-            
             TypeEntity entity = this.itemService.getItem(id);
 
-            IndustryView view = new IndustryView(entity, materials, activityType, runs, me);
+            IndustryView view = new IndustryView(entity, materials, runs, me);
 
             return ResponseEntity.ok(ApiResponse.success(view));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.error(null, e.getMessage()));
         }
 
+    }
+
+    @GetMapping("/item/{id}")
+    public ResponseEntity<ApiResponse<IndustryItemView>> getIndustryItem(@PathVariable String id) {
+        String activityType = this.industryService.getItemActivityType(id);
+        TypeEntity entity = this.itemService.getItem(id);
+        return ResponseEntity.ok(ApiResponse.success(new IndustryItemView(id, entity.getDisplayName(), activityType)));
     }
 
     

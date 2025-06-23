@@ -11,26 +11,23 @@ public class IndustryView {
     private final String name;
     private final Integer runs;
     private final Integer me;
-    private final String activityType;
     
     private final List<Material> materials;
 
-    public IndustryView(TypeEntity item, List<Material> materials, String activityType, Integer runs, Integer me) {
+    public IndustryView(TypeEntity item, List<Material> materials, Integer runs, Integer me) {
         this.id = item.getEntityId();
         this.name = item.getDisplayName();
         this.runs = runs;
         this.me = me;
         this.materials = materials;
-        this.activityType = activityType;
     }
 
-    public IndustryView(TypeEntity item, List<Material> materials, String activityType) {
+    public IndustryView(TypeEntity item, List<Material> materials) {
         this.id = item.getEntityId();
         this.name = item.getDisplayName();
         this.runs = 1;
         this.me = 0;
         this.materials = materials;
-        this.activityType = activityType;
     }
 
     public String getId() {
@@ -47,10 +44,6 @@ public class IndustryView {
 
     public Integer getMe() {
         return me;
-    }
-
-    public String getActivityType() {
-        return activityType;
     }
     
     public List<Material> getMaterials() {
