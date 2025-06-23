@@ -52,6 +52,11 @@ Run the application:
 ./gradlew bootRun
 ```
 
+Hot reload
+```bash
+./gradlew watch
+```
+
 ### Using Local Gradle Installation
 
 If you prefer using a local Gradle installation instead of the wrapper:

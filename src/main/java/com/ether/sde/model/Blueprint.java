@@ -65,17 +65,23 @@ public class Blueprint {
         return new ArrayList<>();
     }
 
-    public List<Material> getManufacturingMaterials(int runs, int meLevel) {
+    public List<Material> getManufacturingMaterials(int desiredQuantity, int meLevel) {
+        if (this.getManufacturingProduct() == null) {
+            return new ArrayList<>();
+        }
         List<Material> allMaterials = new ArrayList<>();
         List<Material> result = new ArrayList<>();
         if (this.getManufacturingMaterials() != null) {
             allMaterials.addAll(this.getManufacturingMaterials());
         }
         
+        int quantityPerRun = this.getManufacturingProduct().quantity;
+        int requiredRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
+
         for (Material mat : allMaterials) {
             double reductionFactor = 1 - 0.01 * meLevel;
-            int adjustedPerRun = Math.max(1, (int) Math.floor(mat.quantity * reductionFactor));
-            int total = adjustedPerRun * runs;
+            int adjustedPerRun = Math.max(1, (int) Math.floor(mat.quantity  * reductionFactor));
+            int total = adjustedPerRun * requiredRuns;
             result.add(Material.create(mat.typeID, total));
         }
     
@@ -91,13 +97,30 @@ public class Blueprint {
         return new ArrayList<>();
     }
 
+    public String getActivityType() {
+        if (this.activities.get("manufacturing") != null) {
+            return "manufacturing";
+        }
+        if (this.activities.get("reaction") != null) {
+            return "reaction";
+        }
+
+        return "unknown";
+    }
+
     
-    public List<Material> getReactionMaterials(int runs) {
+    public List<Material> getReactionMaterials(int desiredQuantity) {
+        if (this.getReactionProduct() == null) {
+            return new ArrayList<>();
+        }
         List<Material> baseMaterials = this.getReactionMaterials();
         List<Material> result = new ArrayList<>();
-
+        
+        int quantityPerRun = this.getReactionProduct().quantity;
+        int requiredRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
+        
         for (Material m : baseMaterials) {
-            int total = m.quantity * runs;
+            int total = m.quantity * requiredRuns;
             result.add(Material.create(m.typeID, total));
         }
     

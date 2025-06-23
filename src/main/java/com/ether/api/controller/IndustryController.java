@@ -43,9 +43,11 @@ public class IndustryController {
 
         try {
             List<Blueprint.Material> materials = this.industryService.getItemManufacturingRequirements(id, runs, me);
+            String activityType = this.industryService.getItemActivityType(id);
+            
             TypeEntity entity = this.itemService.getItem(id);
 
-            IndustryView view = new IndustryView(entity, materials, runs, me);
+            IndustryView view = new IndustryView(entity, materials, activityType, runs, me);
 
             return ResponseEntity.ok(ApiResponse.success(view));
         } catch (Exception e) {

@@ -1,5 +1,8 @@
 package com.ether.api.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,5 +35,19 @@ public class SearchController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/items")
+    public ResponseEntity<ApiResponse<List<ItemView>>> searchItems(@RequestParam("q") String query) {
+        try {
+            List<TypeEntity> types = this.searchService.searchItemsByName(query);
+            if (types.isEmpty()) {
+                return ResponseEntity.ok(ApiResponse.success(List.of()));
+            }
+            return ResponseEntity.ok(ApiResponse.success(types.stream().map(ItemView::new).collect(Collectors.toList())));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        
     }
 }
