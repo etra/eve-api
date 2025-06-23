@@ -105,7 +105,7 @@ public class Blueprint {
             return "reaction";
         }
 
-        return "unknown";
+        return "raw";
     }
 
     

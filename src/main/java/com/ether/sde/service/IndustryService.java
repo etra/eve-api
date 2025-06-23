@@ -25,11 +25,11 @@ public class IndustryService {
         }
         return blueprint.getMaterials(runs, meLevel);
     }
-    
+
     public String getItemActivityType(String typeId) {
         Blueprint blueprint = this.cache.getItemBlueprint().get(typeId);
         if (blueprint == null) {
-            return null;
+            return "raw";
         }
         return blueprint.getActivityType();
     }
