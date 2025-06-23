@@ -30,7 +30,8 @@ public class IndustryController {
     }
 
     @GetMapping("/requirements/{id}")
-    public ResponseEntity<ApiResponse<IndustryView>> getRequirements(@PathVariable String id, @RequestParam(required = false) Integer runs, @RequestParam(required = false) Integer me) {
+    public ResponseEntity<ApiResponse<IndustryView>> getRequirements(@PathVariable String id, @RequestParam(required = false) Integer runs, @RequestParam(required = false) Integer me, @RequestParam(required = false) Double materialBonus) {
+        materialBonus = materialBonus == null ? 0.0 : materialBonus;
         runs = runs == null ? 1 : runs;
         me = me == null ? 0 : me;
 
@@ -43,7 +44,7 @@ public class IndustryController {
         }
 
         try {
-            List<Blueprint.Material> materials = this.industryService.getItemManufacturingRequirements(id, runs, me);
+            List<Blueprint.Material> materials = this.industryService.getItemManufacturingRequirements(id, runs, me, materialBonus);
             TypeEntity entity = this.itemService.getItem(id);
 
             IndustryView view = new IndustryView(entity, materials, runs, me);

@@ -18,12 +18,12 @@ public class IndustryService {
         this.cache = cache;
     }
 
-    public List<Blueprint.Material> getItemManufacturingRequirements(String typeId, Integer runs, Integer meLevel) {
+    public List<Blueprint.Material> getItemManufacturingRequirements(String typeId, Integer runs, Integer meLevel, Double materialBonus) {
         Blueprint blueprint = this.cache.getItemBlueprint().get(typeId);
         if (blueprint == null) {
             return new ArrayList<>();
         }
-        return blueprint.getMaterials(runs, meLevel);
+        return blueprint.getMaterials(runs, meLevel, materialBonus);
     }
 
     public String getItemActivityType(String typeId) {

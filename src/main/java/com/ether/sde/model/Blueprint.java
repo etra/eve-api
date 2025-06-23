@@ -65,7 +65,7 @@ public class Blueprint {
         return new ArrayList<>();
     }
 
-    public List<Material> getManufacturingMaterials(int desiredQuantity, int meLevel) {
+    public List<Material> getManufacturingMaterials(int desiredQuantity, int meLevel, double materialBonus) {
         if (this.getManufacturingProduct() == null) {
             return new ArrayList<>();
         }
@@ -77,15 +77,12 @@ public class Blueprint {
         
         int quantityPerRun = this.getManufacturingProduct().quantity;
         int requiredRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
-
+        double reductionFactor = 1 - 0.01 * meLevel;
+        double materialBonusFactor = 1 - materialBonus;
         for (Material mat : allMaterials) {
-            double reductionFactor = 1 - 0.01 * meLevel;
-            int adjustedPerRun = Math.max(1, (int) Math.floor(mat.quantity  * reductionFactor));
-            int total = adjustedPerRun * requiredRuns;
+            int total = Math.max(1, (int) Math.ceil(requiredRuns *mat.quantity  * reductionFactor * materialBonusFactor));
             result.add(Material.create(mat.typeID, total));
         }
-    
-    
         return result;
     }
 
@@ -109,7 +106,7 @@ public class Blueprint {
     }
 
     
-    public List<Material> getReactionMaterials(int desiredQuantity) {
+    public List<Material> getReactionMaterials(int desiredQuantity, double materialBonus) {
         if (this.getReactionProduct() == null) {
             return new ArrayList<>();
         }
@@ -118,9 +115,9 @@ public class Blueprint {
         
         int quantityPerRun = this.getReactionProduct().quantity;
         int requiredRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
-        
+        double materialBonusFactor = 1 - materialBonus;
         for (Material m : baseMaterials) {
-            int total = m.quantity * requiredRuns;
+            int total = Math.max(1, (int) Math.floor(requiredRuns * m.quantity  * materialBonusFactor));
             result.add(Material.create(m.typeID, total));
         }
     
@@ -135,10 +132,10 @@ public class Blueprint {
     }
 
 
-    public List<Material> getMaterials(int runs, int meLevel) {
+    public List<Material> getMaterials(int runs, int meLevel, double materialBonus) {
         List<Material> requiredMaterials = new ArrayList<>();
-        requiredMaterials.addAll(this.getManufacturingMaterials(runs, meLevel));
-        requiredMaterials.addAll(this.getReactionMaterials(runs));
+        requiredMaterials.addAll(this.getManufacturingMaterials(runs, meLevel, materialBonus));
+        requiredMaterials.addAll(this.getReactionMaterials(runs, materialBonus));
         return requiredMaterials;
     }
 
