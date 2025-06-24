@@ -31,7 +31,7 @@ public class IndustryController {
 
     @GetMapping("/requirements/{id}")
     public ResponseEntity<ApiResponse<IndustryView>> getRequirements(@PathVariable String id, @RequestParam(required = false) Integer runs, @RequestParam(required = false) Integer me, @RequestParam(required = false) Double materialBonus) {
-        materialBonus = materialBonus == null ? 0.0 : materialBonus;
+        materialBonus = materialBonus == null ? 1.0 : materialBonus;
         runs = runs == null ? 1 : runs;
         me = me == null ? 0 : me;
 

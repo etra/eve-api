@@ -66,6 +66,12 @@ public class Blueprint {
     }
 
     public List<Material> getManufacturingMaterials(int desiredQuantity, int meLevel, double materialBonus) {
+        //NumberOfRuns = ceil(DesiredItemCount / OutputPerRun)
+        //PerRunQty = max(1, floor(BaseQuantity × (1 - 0.01 × ME) × (1 - StructureMaterialBonus)))
+
+        //FinalQuantity = PerRunQty × NumberOfRuns
+
+
         if (this.getManufacturingProduct() == null) {
             return new ArrayList<>();
         }
@@ -76,12 +82,14 @@ public class Blueprint {
         }
         
         int quantityPerRun = this.getManufacturingProduct().quantity;
-        int requiredRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
-        double reductionFactor = 1 - 0.01 * meLevel;
-        double materialBonusFactor = 1 - materialBonus;
+        int numberOfRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
+        
+
+        double reductionFactor = 1 - 0.01 * meLevel; // ME reduces materials by 2% per level
         for (Material mat : allMaterials) {
-            int total = Math.max(1, (int) Math.ceil(requiredRuns *mat.quantity  * reductionFactor * materialBonusFactor));
-            result.add(Material.create(mat.typeID, total));
+            double perRunQty = Math.max(1,  mat.quantity * reductionFactor * materialBonus);
+            int finalQuantity = (int) Math.floor(perRunQty * numberOfRuns);
+            result.add(Material.create(mat.typeID, finalQuantity));
         }
         return result;
     }
@@ -115,9 +123,10 @@ public class Blueprint {
         
         int quantityPerRun = this.getReactionProduct().quantity;
         int requiredRuns = (int) Math.ceil((double) desiredQuantity / quantityPerRun);
-        double materialBonusFactor = 1 - materialBonus;
+        
         for (Material m : baseMaterials) {
-            int total = Math.max(1, (int) Math.floor(requiredRuns * m.quantity  * materialBonusFactor));
+            double perRunQty = Math.max(1, m.quantity * materialBonus);
+            int total = (int) Math.floor(perRunQty * requiredRuns);
             result.add(Material.create(m.typeID, total));
         }
     

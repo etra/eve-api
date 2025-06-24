@@ -4,13 +4,14 @@ After=network.target
 
 [Service]
 Type=simple
-User=eve-api
-Group=eve-api
 WorkingDirectory=/home/arturas/eve-api
 ExecStart=java -jar /home/arturas/eve-api/eve-api.jar
 Restart=always
 RestartSec=10
 Environment="SPRING_PROFILES_ACTIVE=prod"
+StandardOutput=append:/home/arturas/eve-api/output.log
+StandardError=append:/home/arturas/eve-api/error.log
+
 
 [Install]
 WantedBy=multi-user.target 
