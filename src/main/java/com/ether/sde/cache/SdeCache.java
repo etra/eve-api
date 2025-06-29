@@ -10,10 +10,20 @@ import com.ether.sde.model.Blueprint;
 import com.ether.sde.model.CategoryEntity;
 import com.ether.sde.model.GroupEntity;
 import com.ether.sde.model.MarketGroupEntity;
+import com.ether.sde.model.OreMinerals;
 import com.ether.sde.model.TypeEntity;
+import com.ether.sde.model.TypeMaterial;
+import com.ether.sde.model.mining.Mineral;
+import com.ether.sde.model.mining.Ore;
 
 import jakarta.annotation.PostConstruct;
+/**
+ * Veldspar: 1230
+Tritanium: 34
 
+
+
+ */
 @Component
 public class SdeCache {
 
@@ -24,9 +34,13 @@ public class SdeCache {
     private Map<String, CategoryEntity> categories;
     private Map<String, MarketGroupEntity> marketGroups;
     private Map<String, Blueprint> blueprints;
+    private Map<String, TypeMaterial> typeMaterials;
 
     private HashMap<String, String> itemsNameToKey;
     private HashMap<String, Blueprint> itemBlueprint;
+    private HashMap<String, OreMinerals> oreMinerals;
+    private HashMap<String, Ore> oreMining;
+
 
     public SdeCache(YamlLoadService yamlLoader) {
         this.yamlLoader = yamlLoader;
@@ -39,10 +53,58 @@ public class SdeCache {
         categories = yamlLoader.load("fsd/categories.yaml", CategoryEntity.class);
         marketGroups = yamlLoader.load("fsd/marketGroups.yaml", MarketGroupEntity.class);
         blueprints = yamlLoader.load("fsd/blueprints.yaml", Blueprint.class);
+        typeMaterials = yamlLoader.load("fsd/typeMaterials.yaml", TypeMaterial.class);
         
         generateIndexes();
     }
 
+    private void generateOreMining() {
+        oreMining = new HashMap<>();
+
+        this.types.values().forEach(oreType -> {
+            if (oreType.isPublished() == false) {
+                return;
+            }
+            GroupEntity groupEntity = groups.get(String.valueOf(oreType.getGroupID()));
+            if (groupEntity == null) {
+                return;
+            }
+            if (groupEntity.isPublished() == false) {
+                return;
+            }
+            if (groupEntity.getCategoryID() != 25) {
+                return;
+            }
+            TypeMaterial typeMaterial = typeMaterials.get(oreType.getEntityId());
+            if (typeMaterial == null) {
+                return;
+            }
+            if (typeMaterial.getMaterials().isEmpty()) {
+                return;
+            }
+            
+            if (oreType.getDisplayName().contains("Batch Compressed ")) {
+                return;
+            }
+            if (oreType.getDisplayName().contains("Compressed ")) {
+                return;
+            }
+
+            Ore ore = new Ore(groupEntity, oreType);  
+            oreMining.put(oreType.getEntityId(), ore);            
+
+            typeMaterial.getMaterials().forEach(material -> {
+                TypeEntity mineralEntity = types.get(String.valueOf(material.materialTypeID));
+                if (mineralEntity == null) {
+                    return;
+                }
+                if (mineralEntity.isPublished() == false) {
+                    return;
+                }
+                ore.addMineral(new Mineral(ore, mineralEntity, material.quantity));
+            });
+        });
+    }
 
     private void generateIndexes() {
         itemsNameToKey = new HashMap<>();
@@ -64,6 +126,8 @@ public class SdeCache {
                 itemBlueprint.put(key, blueprint);
             }
         });
+        
+        generateOreMining();
     }
 
     public TypeEntity getType(String id) {
@@ -104,5 +168,9 @@ public class SdeCache {
 
     public Map<String, Blueprint> getItemBlueprint() {
         return itemBlueprint;
+    }
+
+    public Map<String, Ore> getOreMining() {
+        return oreMining;
     }
 }

@@ -63,6 +63,8 @@ public class TypeEntity implements HasEntityId {
     private Integer portionSize;
     private boolean published;
     private Integer marketGroupID;
+    private double volume;
+
 
     private GroupEntity group; // <-- will be linked post-load
 
@@ -97,4 +99,10 @@ public class TypeEntity implements HasEntityId {
     public String getDisplayName() {
         return this.name.get("en");
     }
+
+    public double getVolume() { return volume; }
+    public void setVolume(double volume) { this.volume = volume; }
+
+    public double getReprocessingVolume() { return this.volume * 100; }
+    
 }

@@ -52,6 +52,10 @@ Run the application:
 ./gradlew bootRun
 ```
 
+```
+watchexec -e java -w src -- ./gradlew classes
+./gradlew bootrun
+
 Hot reload
 ```bash
 ./gradlew watch

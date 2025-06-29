@@ -61,4 +61,8 @@ public class GroupEntity implements HasEntityId {
 
     public boolean isUseBasePrice() { return useBasePrice; }
     public void setUseBasePrice(boolean useBasePrice) { this.useBasePrice = useBasePrice; }
+
+    public String getDisplayName() {
+        return this.name.get("en");
+    }
 }

@@ -1,5 +1,6 @@
 package com.ether.sde.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,8 @@ public class SearchService {
         final String lowered = query.toLowerCase();
         return this.cache.getItemsNameToKey().entrySet().stream()
             .filter(entry -> entry.getKey().contains(lowered))
-            .limit(10)
+            .sorted(Comparator.comparingInt(entry -> entry.getKey().length()))
+            .limit(50)
             .map(entry -> this.cache.getType(entry.getValue()))
             .collect(Collectors.toList());
     }
