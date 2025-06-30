@@ -1,34 +1,53 @@
-// package com.ether.api.view;
+package com.ether.api.view;
 
-// import com.ether.sde.utils.MiningOptimizer.OrePlan;
+import java.util.ArrayList;
+import java.util.List;
 
-// public class OptimizationOreView {
-//     private OrePlan orePlan;
+import com.ether.sde.model.TypeEntity;
+import com.ether.sde.model.mining.optimization.OrePlan;
 
-//     public OptimizationOreView(OrePlan orePlan) {
-//         this.orePlan = orePlan;
-//     }
-//     public String getId() {
-//         return orePlan.getOre().getOre().getEntityId();
-//     }
+public class OptimizationOreView {
+    private OrePlan orePlan;
 
-//     public String getName() {
-//         return orePlan.getOre().getOre().getDisplayName();
-//     }
+    public OptimizationOreView(OrePlan orePlan) {
+        this.orePlan = orePlan;
+    }
 
-//     public double getCycles() {
-//         return orePlan.getCyclesNeeded();
-//     }
-//     public double getVolume() {
-//         return orePlan.getVolumeNeeded();
-//     }
+    public String getId() {
+        return orePlan.getOre().getOre().getEntityId();
+    }
 
-//     public double getItems() {
-//         return orePlan.getItemsNeeded();
-//     }
+    public String getName() {
+        return orePlan.getOre().getOre().getDisplayName();
+    }
 
-//     public String getInfo() {
-//         return orePlan.toString();
-//     }
+    public int getCycles() {
+        return (int) orePlan.getCyclesNeeded();
+    }
+
+    public double getVolume() {
+        return orePlan.getTotalVolume();
+    }
+
+    public int getItems() {
+        return (int) orePlan.getTotalItems();
+    }
+
+    public List<OptimizationMineralView> getMinerals() {
+        List<OptimizationMineralView> minerals = new ArrayList<>();
+        orePlan.getMineralsProvided().forEach((entityId, quantity) -> {
+            TypeEntity entity = orePlan.getOre().getMinerals().get(entityId).getMineral();
+            if (entity != null) {
+                minerals.add(new OptimizationMineralView(entity, quantity));
+            }
+        });
+
+
+        return minerals;
+    }
+
+    // public List<OptimizationMineralView> getMinerals() {
+    //     return orePlan.getMineralsProvided().entrySet().stream().map(OptimizationMineralView::new).collect(Collectors.toList());
+    // }
     
-// }
+}

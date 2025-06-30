@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.ether.sde.cache.SdeCache;
+import com.ether.sde.model.TypeEntity;
 import com.ether.sde.model.mining.Ore;
 import com.ether.sde.model.mining.optimization.Response;
 import com.ether.sde.utils.MiningOptimizer;
@@ -21,17 +22,17 @@ public class MiningService {
         this.cache = cache;
     }
 
-    public List<Ore> getOreList(List<String> availableGroups, double oreReprocessingEfficiency, double gasReprocessingEfficiency) {
+    public List<Ore> getOreList(List<String> availableOres, double oreReprocessingEfficiency, double gasReprocessingEfficiency) {
         // return this.cache.getOreMining().values().stream().collect(Collectors.toList());
-        return this.filterOreList(availableGroups, oreReprocessingEfficiency, gasReprocessingEfficiency); 
+        return this.filterOreList(availableOres, oreReprocessingEfficiency, gasReprocessingEfficiency); 
     }
 
 
-    private List<Ore> filterOreList(List<String> availableGroups, double oreReprocessingEfficiency, double gasReprocessingEfficiency) {
+    private List<Ore> filterOreList(List<String> availableOres, double oreReprocessingEfficiency, double gasReprocessingEfficiency) {
         List<Ore> filteredOreGroups = new ArrayList<>();
         
         this.cache.getOreMining().values().forEach(ore -> {
-            if (availableGroups.contains(ore.getGroup().getEntityId()) || availableGroups.isEmpty()) {
+            if (availableOres.contains(ore.getOre().getEntityId()) || availableOres.isEmpty()) {
                 ore.setOreReprocessingEfficiency(oreReprocessingEfficiency);
                 ore.setGasReprocessingEfficiency(gasReprocessingEfficiency);
                 filteredOreGroups.add(ore);
@@ -41,12 +42,23 @@ public class MiningService {
         return filteredOreGroups;
     }
 
-    public Response getMiningStrategies(List<String> availableGroups, Map<Integer, Double> requestedMinerals, double miningYieldPerCycle, double oreReprocessingEfficiency, double gasReprocessingEfficiency) {
-        List<Ore> oreList = this.filterOreList(availableGroups, oreReprocessingEfficiency, gasReprocessingEfficiency);
+    public Response getMiningStrategies(List<String> availableOres, Map<Integer, Double> requestedMinerals, double miningYieldPerCycle, double oreReprocessingEfficiency, double gasReprocessingEfficiency) {
+        List<Ore> oreList = this.filterOreList(availableOres, oreReprocessingEfficiency, gasReprocessingEfficiency);
 
         MiningOptimizer optimizer = new MiningOptimizer();
 
-        return optimizer.calculateMiningStrategies(requestedMinerals, oreList, miningYieldPerCycle);
+        Response result = optimizer.calculateMiningStrategies(requestedMinerals, oreList, miningYieldPerCycle);
+        List<TypeEntity> unfulfillableEntities = new ArrayList<>();
+        result.getUnfulfillableMinerals().forEach(entityId -> {
+            TypeEntity entity = this.cache.getType(String.valueOf(entityId));
+            if (entity != null) {
+                unfulfillableEntities.add(entity);
+            }
+        });
+        result.setUnfulfillableEntities(unfulfillableEntities);
+
+        System.out.println(result);
+        return result;
     }
 
     // public MiningOptimizer.OptimizationResult getMiningStrategies(List<String> availableGroups, Map<Integer, Double> requestedMinerals, double miningYieldPerCycle) {

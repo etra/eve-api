@@ -103,11 +103,11 @@ public class MiningOptimizer {
         Map<Integer, Double> remainingNeeds = new HashMap<>(requestedMinerals);
         List<OrePlan> orePlans = new ArrayList<>();
         int iteration = 0;
-        while (remainingNeeds.values().stream().anyMatch(q -> q > 0) && iteration < 10) {
-            System.out.println("Iteration: " + iteration);
-            System.out.println("Remaining needs: " + remainingNeeds);
+        while (remainingNeeds.values().stream().anyMatch(q -> q > 0) && iteration < 100) {
+            // System.out.println("Iteration: " + iteration);
+            // System.out.println("Remaining needs: " + remainingNeeds);
             Ore bestOre = findBestOre(remainingNeeds, ores);
-            System.out.println("Best ore: " + bestOre.getOre().getDisplayName());
+            // System.out.println("Best ore: " + bestOre.getOre().getDisplayName());
             if (bestOre == null) break;
 
             OrePlan orePlan = computeOrePlan(bestOre, remainingNeeds, miningYieldPerCycle);
@@ -140,9 +140,9 @@ public class MiningOptimizer {
     }
 
     private Ore findBestOre(Map<Integer, Double> remainingNeeds, Collection<Ore> ores) {
-        System.out.println("Finding best ore");
-        System.out.println("Remaining needs: " + remainingNeeds);
-        System.out.println("Ores: " + ores);
+        // System.out.println("Finding best ore");
+        // System.out.println("Remaining needs: " + remainingNeeds);
+        // System.out.println("Ores: " + ores);
         return ores.stream()
                 .min(Comparator.comparingDouble(ore -> {
                     double score = 0;

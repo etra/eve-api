@@ -18,4 +18,7 @@ public class ItemService {
         return this.cache.getType(typeId);
     }
 
+    public String getItemKeyByName(String name) {
+        return this.cache.getItemsNameToKey().get(name.toLowerCase());
+    }
 }
