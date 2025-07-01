@@ -35,7 +35,7 @@ public class IndustryController {
         runs = runs == null ? 1 : runs;
         me = me == null ? 0 : me;
 
-        if (runs < 1) {
+        if (runs < 0) {
             return ResponseEntity.badRequest().body(ApiResponse.error(null, "Runs must be greater than 0"));
         }
 

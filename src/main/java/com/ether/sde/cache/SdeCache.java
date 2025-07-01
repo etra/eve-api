@@ -83,13 +83,6 @@ public class SdeCache {
                 return;
             }
             
-            if (oreType.getDisplayName().contains("Batch Compressed ")) {
-                return;
-            }
-            if (oreType.getDisplayName().contains("Compressed ")) {
-                return;
-            }
-
             Ore ore = new Ore(groupEntity, oreType);  
             oreMining.put(oreType.getEntityId(), ore);            
 
